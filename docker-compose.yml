@@ -1,4 +1,4 @@
-name: japanese-stack
+name: ven-ayuda-stack
 
 services:
   postgres:
@@ -137,3 +137,4 @@ services:
 
 volumes:
   redis_data:
+    name: ven-ayuda-redis-data

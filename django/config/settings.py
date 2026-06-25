@@ -151,7 +151,7 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-# Application loggers (e.g. ``core.services.conversations``) use INFO; the root logger
+# Application loggers use INFO; the root logger
 # defaults to WARNING, so without this those messages never reach the console.
 LOGGING = {
     "version": 1,

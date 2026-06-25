@@ -2,7 +2,7 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   reactCompiler: true,
-  allowedDevOrigins: ["japanese.charlytoc.dev"],
+  allowedDevOrigins: ["ven-ayuda.charlytoc.dev"],
 };
 
 export default nextConfig;

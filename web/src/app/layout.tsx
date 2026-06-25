@@ -10,8 +10,8 @@ import { theme } from "@/lib/theme";
 import "./globals.css";
 
 export const metadata = {
-  title: "Japanese Practice",
-  description: "Practice Japanese with an AI tutor.",
+  title: "ven-ayuda.me",
+  description: "Mapa de solicitudes de ayuda en Venezuela.",
 };
 
 export default function RootLayout({
@@ -20,7 +20,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" {...mantineHtmlProps}>
+    <html lang="es" {...mantineHtmlProps}>
       <head>
         <ColorSchemeScript defaultColorScheme="dark" />
       </head>
