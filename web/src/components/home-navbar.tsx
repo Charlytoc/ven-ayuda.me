@@ -42,16 +42,12 @@ export function HomeNavbar({ title, showBack = false }: HomeNavbarProps) {
                 <IconArrowLeft size={18} />
               </ActionIcon>
             ) : null}
-            <Group
-              gap="xs"
-              component={Link}
-              href="/"
-              style={{ textDecoration: "none", color: "inherit" }}
-              wrap="nowrap"
-            >
-              <VenEmergenciasLogoIcon size={24} />
-              <Title order={4}>{title ?? APP_NAME}</Title>
-            </Group>
+            <Link href="/" style={{ textDecoration: "none", color: "inherit" }}>
+              <Group gap="xs" wrap="nowrap">
+                <VenEmergenciasLogoIcon size={24} />
+                <Title order={4}>{title ?? APP_NAME}</Title>
+              </Group>
+            </Link>
           </Group>
           {!showBack ? <RescuerNavLink /> : null}
         </Group>
