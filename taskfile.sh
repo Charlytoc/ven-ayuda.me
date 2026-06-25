@@ -24,14 +24,14 @@ function help() {
   echo "Development Tasks:"
   echo "  setup-env         Copy .env if missing, generate VAPID keys, uv sync Django .venv"
   echo "  setup-django      Initialize Django (migrate, create superuser)"
-  echo "  start [--rebuild,-r]   Start backend (Docker: Django, Celery, Redis, Realtime, Nginx)"
+  echo "  start [--rebuild,-r]   Start backend (Docker: Django, Celery, Redis, Nginx)"
   echo "  down              Stop development environment"
   echo "  down-clean        Stop and clean development environment (removes volumes)"
   echo "  migrate [app migration] Run Django migrations"
   echo "  test [args ...]   Run Django tests inside the django container (manage.py test)"
   echo "  shell [cmd ...]   Open a shell in the django container (or run a one-off command)"
   echo "  web               Start frontend natively (npm run dev)"
-  echo "  tunnel [name] [url] Run Cloudflare tunnel (defaults: coworkers http://localhost:\${ENTRYPOINT_PORT:-9000})"
+  echo "  tunnel [name] [url] Run Cloudflare tunnel (defaults: ven-emergencias http://localhost:\${ENTRYPOINT_PORT:-9000})"
   echo "  psql              Connect to PostgreSQL database"
   echo ""
   echo "Examples:"
@@ -193,22 +193,19 @@ function web() {
 
   local missing=()
   [[ -z "${WEB_API_URL:-}" ]] && missing+=("WEB_API_URL")
-  [[ -z "${WEB_REALTIME_URL:-}" ]] && missing+=("WEB_REALTIME_URL")
   if [[ ${#missing[@]} -gt 0 ]]; then
     echo "ERROR: missing required variables in .env: ${missing[*]}" >&2
-    echo "  WEB_API_URL      — URL the browser uses to reach the API (e.g. http://localhost:9000/api)" >&2
-    echo "  WEB_REALTIME_URL — host the browser uses to reach the realtime server (e.g. http://localhost:9000)" >&2
+    echo "  WEB_API_URL — URL the browser uses to reach the API (e.g. http://localhost:9000/api)" >&2
     exit 1
   fi
 
   # Type generation reads the schema directly from Django, stays on the local network.
   local openapi_url="${WEB_OPENAPI_URL:-http://localhost:${DJANGO_PORT:-8000}/api/openapi.json}"
 
-  echo "web → API=${WEB_API_URL} realtime=${WEB_REALTIME_URL}"
+  echo "web → API=${WEB_API_URL}"
   cd "$web_dir"
   OPENAPI_URL="$openapi_url" \
   NEXT_PUBLIC_API_BASE_URL="$WEB_API_URL" \
-  NEXT_PUBLIC_REALTIME_URL="$WEB_REALTIME_URL" \
   npm run dev -- --port "$port"
 }
 
@@ -220,7 +217,7 @@ function tunnel() {
   fi
 
   source "$(dirname "$0")/.env" 2>/dev/null || true
-  local tunnel_name="${1:-ven-ayuda}"
+  local tunnel_name="${1:-ven-emergencias}"
   local tunnel_url="${2:-http://localhost:${ENTRYPOINT_PORT:-9000}}"
   echo "tunnel → ${tunnel_name} @ ${tunnel_url}"
   cloudflared tunnel run --url "$tunnel_url" "$tunnel_name"

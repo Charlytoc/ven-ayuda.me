@@ -99,25 +99,6 @@ services:
       - redis
       - celery
 
-  realtime:
-    container_name: "realtime-${CONTAINER_SUFFIX}"
-    build:
-      context: ./realtime
-      dockerfile: Dockerfile
-    environment:
-      - NODE_ENV=development
-      - PORT=3001
-      - REDIS_HOST=redis
-    ports:
-      - "${REALTIME_PORT:-3001}:3001"
-    volumes:
-      - ./realtime:/app
-      - /app/node_modules
-    command: npm run dev
-    depends_on:
-      redis:
-        condition: service_healthy
-
   nginx:
     container_name: "nginx-${CONTAINER_SUFFIX}"
     build:
@@ -131,8 +112,6 @@ services:
     depends_on:
       django:
         condition: service_healthy
-      realtime:
-        condition: service_started
     restart: unless-stopped
 
 volumes:
