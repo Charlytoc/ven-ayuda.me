@@ -5,16 +5,15 @@ import L from "leaflet";
 import { CircleMarker, MapContainer, TileLayer, useMap, useMapEvents } from "react-leaflet";
 
 import { DEFAULT_ZOOM, VENEZUELA_CENTER, severityColor } from "@/lib/constants";
-import type { HelpRequest } from "@/lib/types/help-request";
+import type { HelpRequest, LatLng } from "@/lib/types/help-request";
 
 import "leaflet/dist/leaflet.css";
 
-type LatLng = { lat: number; lng: number };
-
 type HelpMapProps = {
   requests: HelpRequest[];
-  draftLocation: LatLng | null;
-  onDraftLocationChange: (location: LatLng) => void;
+  interactive?: boolean;
+  draftLocation?: LatLng | null;
+  onDraftLocationChange?: (location: LatLng) => void;
 };
 
 function MapClickHandler({
@@ -53,9 +52,23 @@ function DraftPin({ location }: { location: LatLng }) {
   return null;
 }
 
+function MapInvalidator() {
+  const map = useMap();
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      map.invalidateSize();
+    }, 100);
+    return () => window.clearTimeout(timer);
+  }, [map]);
+
+  return null;
+}
+
 export function HelpMap({
   requests,
-  draftLocation,
+  interactive = false,
+  draftLocation = null,
   onDraftLocationChange,
 }: HelpMapProps) {
   return (
@@ -69,8 +82,11 @@ export function HelpMap({
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
-      <MapClickHandler onDraftLocationChange={onDraftLocationChange} />
-      {draftLocation ? <DraftPin location={draftLocation} /> : null}
+      <MapInvalidator />
+      {interactive && onDraftLocationChange ? (
+        <MapClickHandler onDraftLocationChange={onDraftLocationChange} />
+      ) : null}
+      {interactive && draftLocation ? <DraftPin location={draftLocation} /> : null}
       {requests.map((request) => {
         const lat = Number(request.latitude);
         const lng = Number(request.longitude);
@@ -81,12 +97,12 @@ export function HelpMap({
           <CircleMarker
             key={request.id}
             center={[lat, lng]}
-            radius={10}
+            radius={interactive ? 10 : 8}
             pathOptions={{
               color: "#ffffff",
               weight: 2,
               fillColor: severityColor(request.severity),
-              fillOpacity: 0.9,
+              fillOpacity: 0.92,
             }}
           />
         );

@@ -4,6 +4,7 @@ export type HelpRequestStatus = "open" | "in_progress" | "resolved";
 
 export type HelpRequest = {
   id: string;
+  title: string;
   latitude: string;
   longitude: string;
   severity: HelpRequestSeverity;
@@ -18,10 +19,11 @@ export type HelpRequest = {
 };
 
 export type HelpRequestCreate = {
+  title: string;
   latitude: number;
   longitude: number;
   severity: HelpRequestSeverity;
-  description: string;
+  description?: string;
   contact_name?: string;
   contact_phone?: string;
   contact_email?: string;
@@ -32,3 +34,5 @@ export type ApiError = {
   error: string;
   error_code?: string;
 };
+
+export type LatLng = { lat: number; lng: number };

@@ -12,10 +12,11 @@ class ErrorResponseSchema(Schema):
 
 
 class HelpRequestCreate(Schema):
+    title: str = Field(min_length=3, max_length=255)
     latitude: Decimal = Field(ge=-90, le=90)
     longitude: Decimal = Field(ge=-180, le=180)
     severity: str
-    description: str
+    description: str = ""
     contact_name: str = ""
     contact_phone: str = ""
     contact_email: str = ""
@@ -24,6 +25,7 @@ class HelpRequestCreate(Schema):
 
 class HelpRequestResponse(Schema):
     id: UUID
+    title: str
     latitude: Decimal
     longitude: Decimal
     severity: str

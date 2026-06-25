@@ -20,10 +20,11 @@ class HelpRequest(TimeStampedModel):
         RESOLVED = "resolved", "Resolved"
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    title = models.CharField(max_length=255)
     latitude = models.DecimalField(max_digits=9, decimal_places=6)
     longitude = models.DecimalField(max_digits=9, decimal_places=6)
     severity = models.CharField(max_length=20, choices=Severity.choices)
-    description = models.TextField()
+    description = models.TextField(blank=True)
     contact_name = models.CharField(max_length=255, blank=True)
     contact_phone = models.CharField(max_length=40, blank=True)
     contact_email = models.EmailField(blank=True)
@@ -47,5 +48,4 @@ class HelpRequest(TimeStampedModel):
         ordering = ("-created",)
 
     def __str__(self) -> str:
-        label = self.contact_name or str(self.id)
-        return f"{self.get_severity_display()} — {label}"
+        return f"{self.get_severity_display()} — {self.title}"

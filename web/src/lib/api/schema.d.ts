@@ -141,6 +141,8 @@ export interface components {
              * Format: uuid
              */
             id: string;
+            /** Title */
+            title: string;
             /** Latitude */
             latitude: string;
             /** Longitude */
@@ -172,13 +174,18 @@ export interface components {
         };
         /** HelpRequestCreate */
         HelpRequestCreate: {
+            /** Title */
+            title: string;
             /** Latitude */
             latitude: number | string;
             /** Longitude */
             longitude: number | string;
             /** Severity */
             severity: string;
-            /** Description */
+            /**
+             * Description
+             * @default
+             */
             description: string;
             /**
              * Contact Name

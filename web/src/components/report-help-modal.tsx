@@ -2,10 +2,11 @@
 
 import { useEffect, useRef, useState } from "react";
 import {
+  Box,
   Button,
-  Drawer,
   FileButton,
   Group,
+  Modal,
   Select,
   Stack,
   Text,
@@ -15,69 +16,56 @@ import {
 import { notifications } from "@mantine/notifications";
 import { IconMapPin, IconPhoto } from "@tabler/icons-react";
 
+import { HelpMapPanel } from "@/components/help-map-panel";
 import { createHelpRequest } from "@/lib/api/help-requests";
 import { uploadImage } from "@/lib/api/uploads";
 import { SEVERITY_OPTIONS } from "@/lib/constants";
-import type { HelpRequestSeverity } from "@/lib/types/help-request";
+import type { HelpRequestSeverity, LatLng } from "@/lib/types/help-request";
 
-type LatLng = { lat: number; lng: number };
-
-type ReportHelpDrawerProps = {
+type ReportHelpModalProps = {
   opened: boolean;
   onClose: () => void;
-  draftLocation: LatLng | null;
-  onDraftLocationChange: (location: LatLng) => void;
   onSubmitted: () => void;
 };
 
-export function ReportHelpDrawer({
+export function ReportHelpModal({
   opened,
   onClose,
-  draftLocation,
-  onDraftLocationChange,
   onSubmitted,
-}: ReportHelpDrawerProps) {
+}: ReportHelpModalProps) {
+  const [title, setTitle] = useState("");
   const [severity, setSeverity] = useState<HelpRequestSeverity>("urgent");
   const [description, setDescription] = useState("");
-  const [contactName, setContactName] = useState("");
-  const [contactPhone, setContactPhone] = useState("");
-  const [contactEmail, setContactEmail] = useState("");
+  const [draftLocation, setDraftLocation] = useState<LatLng | null>(null);
   const [photos, setPhotos] = useState<File[]>([]);
   const [submitting, setSubmitting] = useState(false);
   const [locating, setLocating] = useState(false);
   const resetOnClose = useRef(false);
 
   useEffect(() => {
-    if (!opened) {
-      return;
-    }
-
-    if (draftLocation || !navigator.geolocation) {
+    if (!opened || draftLocation || !navigator.geolocation) {
       return;
     }
 
     setLocating(true);
     navigator.geolocation.getCurrentPosition(
       (position) => {
-        onDraftLocationChange({
+        setDraftLocation({
           lat: position.coords.latitude,
           lng: position.coords.longitude,
         });
         setLocating(false);
       },
-      () => {
-        setLocating(false);
-      },
+      () => setLocating(false),
       { enableHighAccuracy: true, timeout: 10000 },
     );
-  }, [opened, draftLocation, onDraftLocationChange]);
+  }, [opened, draftLocation]);
 
   function resetForm() {
+    setTitle("");
     setSeverity("urgent");
     setDescription("");
-    setContactName("");
-    setContactPhone("");
-    setContactEmail("");
+    setDraftLocation(null);
     setPhotos([]);
   }
 
@@ -104,7 +92,7 @@ export function ReportHelpDrawer({
     setLocating(true);
     navigator.geolocation.getCurrentPosition(
       (position) => {
-        onDraftLocationChange({
+        setDraftLocation({
           lat: position.coords.latitude,
           lng: position.coords.longitude,
         });
@@ -123,21 +111,21 @@ export function ReportHelpDrawer({
   }
 
   async function handleSubmit() {
-    if (!draftLocation) {
+    const trimmedTitle = title.trim();
+    if (trimmedTitle.length < 3) {
       notifications.show({
         color: "red",
-        title: "Ubicación requerida",
-        message: "Marca un punto en el mapa o usa tu ubicación actual.",
+        title: "Título requerido",
+        message: "Escribe un título breve (mínimo 3 caracteres).",
       });
       return;
     }
 
-    const trimmedDescription = description.trim();
-    if (trimmedDescription.length < 10) {
+    if (!draftLocation) {
       notifications.show({
         color: "red",
-        title: "Descripción muy corta",
-        message: "Describe la situación con al menos 10 caracteres.",
+        title: "Ubicación requerida",
+        message: "Marca tu ubicación en el mapa o usa el botón de geolocalización.",
       });
       return;
     }
@@ -150,20 +138,18 @@ export function ReportHelpDrawer({
       }
 
       await createHelpRequest({
+        title: trimmedTitle,
         latitude: draftLocation.lat,
         longitude: draftLocation.lng,
         severity,
-        description: trimmedDescription,
-        contact_name: contactName.trim(),
-        contact_phone: contactPhone.trim(),
-        contact_email: contactEmail.trim(),
+        description: description.trim(),
         attachment_ids: attachmentIds,
       });
 
       notifications.show({
         color: "green",
         title: "Solicitud enviada",
-        message: "Tu pedido de ayuda fue registrado.",
+        message: "Tu pedido de ayuda fue registrado en el mapa.",
       });
 
       resetOnClose.current = true;
@@ -183,42 +169,24 @@ export function ReportHelpDrawer({
   }
 
   return (
-    <Drawer
+    <Modal
       opened={opened}
       onClose={handleClose}
-      position="bottom"
-      size="85%"
       title="Pedir ayuda"
-      overlayProps={{ opacity: 0.35 }}
+      size="lg"
+      centered
     >
       <Stack gap="md">
-        <Stack gap={4}>
-          <Text size="sm" fw={500}>
-            Ubicación
-          </Text>
-          {draftLocation ? (
-            <Text size="sm" c="dimmed">
-              {draftLocation.lat.toFixed(5)}, {draftLocation.lng.toFixed(5)}
-            </Text>
-          ) : (
-            <Text size="sm" c="dimmed">
-              {locating
-                ? "Obteniendo tu ubicación…"
-                : "Toca el mapa o usa el botón de abajo."}
-            </Text>
-          )}
-          <Button
-            variant="light"
-            leftSection={<IconMapPin size={16} />}
-            onClick={useMyLocation}
-            loading={locating}
-          >
-            Usar mi ubicación
-          </Button>
-        </Stack>
+        <TextInput
+          label="Título"
+          placeholder="Ej.: Familia atrapada, falta agua, herido grave…"
+          value={title}
+          onChange={(event) => setTitle(event.currentTarget.value)}
+          required
+        />
 
         <Select
-          label="Urgencia"
+          label="Gravedad de la emergencia"
           data={SEVERITY_OPTIONS.map((option) => ({
             value: option.value,
             label: option.label,
@@ -231,53 +199,74 @@ export function ReportHelpDrawer({
           }}
         />
 
+        <Stack gap="xs">
+          <Text size="sm" fw={500}>
+            Ubicación
+          </Text>
+          {draftLocation ? (
+            <Text size="sm" c="dimmed">
+              {draftLocation.lat.toFixed(5)}, {draftLocation.lng.toFixed(5)}
+            </Text>
+          ) : (
+            <Text size="sm" c="dimmed">
+              {locating
+                ? "Obteniendo tu ubicación…"
+                : "Toca el mapa para marcar tu ubicación."}
+            </Text>
+          )}
+          <Button
+            variant="light"
+            leftSection={<IconMapPin size={16} />}
+            onClick={useMyLocation}
+            loading={locating}
+          >
+            Usar mi ubicación
+          </Button>
+          <Box
+            style={{
+              height: 220,
+              borderRadius: 8,
+              overflow: "hidden",
+              border: "1px solid var(--mantine-color-dark-4)",
+            }}
+          >
+            <HelpMapPanel
+              requests={[]}
+              height={220}
+              interactive
+              draftLocation={draftLocation}
+              onDraftLocationChange={setDraftLocation}
+            />
+          </Box>
+        </Stack>
+
         <Textarea
-          label="Descripción"
-          placeholder="¿Qué necesitas? Sé específico para que puedan ayudarte."
-          minRows={4}
+          label="Detalles adicionales (opcional)"
+          placeholder="Información extra que pueda ayudar a quienes respondan."
+          minRows={3}
           value={description}
           onChange={(event) => setDescription(event.currentTarget.value)}
-          required
-        />
-
-        <TextInput
-          label="Nombre (opcional)"
-          value={contactName}
-          onChange={(event) => setContactName(event.currentTarget.value)}
-        />
-        <TextInput
-          label="Teléfono (opcional)"
-          value={contactPhone}
-          onChange={(event) => setContactPhone(event.currentTarget.value)}
-        />
-        <TextInput
-          label="Correo (opcional)"
-          type="email"
-          value={contactEmail}
-          onChange={(event) => setContactEmail(event.currentTarget.value)}
         />
 
         <Stack gap="xs">
           <Text size="sm" fw={500}>
             Fotos (opcional)
           </Text>
-          <Group>
-            <FileButton
-              onChange={(files) => {
-                if (files) {
-                  setPhotos((current) => [...current, ...files]);
-                }
-              }}
-              accept="image/jpeg,image/png,image/webp,image/gif"
-              multiple
-            >
-              {(props) => (
-                <Button {...props} variant="default" leftSection={<IconPhoto size={16} />}>
-                  Agregar fotos
-                </Button>
-              )}
-            </FileButton>
-          </Group>
+          <FileButton
+            onChange={(files) => {
+              if (files) {
+                setPhotos((current) => [...current, ...files]);
+              }
+            }}
+            accept="image/jpeg,image/png,image/webp,image/gif"
+            multiple
+          >
+            {(props) => (
+              <Button {...props} variant="default" leftSection={<IconPhoto size={16} />}>
+                Adjuntar fotos
+              </Button>
+            )}
+          </FileButton>
           {photos.length > 0 ? (
             <Text size="sm" c="dimmed">
               {photos.length}{" "}
@@ -286,10 +275,10 @@ export function ReportHelpDrawer({
           ) : null}
         </Stack>
 
-        <Button onClick={handleSubmit} loading={submitting} size="md">
+        <Button onClick={handleSubmit} loading={submitting} size="md" color="red">
           Enviar solicitud
         </Button>
       </Stack>
-    </Drawer>
+    </Modal>
   );
 }

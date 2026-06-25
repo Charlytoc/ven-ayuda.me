@@ -21,7 +21,7 @@ This opens a browser. Select your domain. Cloudflare writes `~/.cloudflared/cert
 ### 2. Create the named tunnel
 
 ```bash
-cloudflared tunnel create japanese
+cloudflared tunnel create ven-ayuda
 ```
 
 Replace `japanese` with whatever name you want — it's just a label.
@@ -30,10 +30,10 @@ This writes credentials to `~/.cloudflared/<tunnel-id>.json`.
 ### 3. Route a subdomain to the tunnel
 
 ```bash
-cloudflared tunnel route dns japanese japanese.charlytoc.dev
+cloudflared tunnel route dns ven-ayuda ven-ayuda.charlytoc.dev
 ```
 
-Replace `japanese.charlytoc.dev` with the subdomain you want. This creates a CNAME record
+Replace `ven-ayuda.charlytoc.dev` with the subdomain you want. This creates a CNAME record
 in Cloudflare DNS automatically. You can verify it in the Cloudflare dashboard under DNS.
 
 ### 4. Set the tunnel URL in your `.env`
@@ -41,8 +41,8 @@ in Cloudflare DNS automatically. You can verify it in the Cloudflare dashboard u
 Point the frontend at the tunnel so the browser's API calls go through it:
 
 ```env
-WEB_API_URL=https://japanese.charlytoc.dev/api
-WEB_REALTIME_URL=https://japanese.charlytoc.dev/realtime
+WEB_API_URL=https://ven-ayuda.charlytoc.dev/api
+WEB_REALTIME_URL=https://ven-ayuda.charlytoc.dev/realtime
 ```
 
 Then restart `./taskfile.sh web` for the new URLs to take effect.
@@ -50,7 +50,7 @@ Then restart `./taskfile.sh web` for the new URLs to take effect.
 Also update `SITE_URL` so Django allows the tunnel hostname:
 
 ```env
-SITE_URL=https://japanese.charlytoc.dev
+SITE_URL=https://ven-ayuda.charlytoc.dev
 ```
 
 ### 5. Run
@@ -58,7 +58,7 @@ SITE_URL=https://japanese.charlytoc.dev
 ```bash
 ./taskfile.sh tunnel
 # or with a custom local URL:
-./taskfile.sh tunnel japanese http://localhost:9003
+./taskfile.sh tunnel ven-ayuda http://localhost:9003
 ```
 
 The tunnel name defaults to `japanese` and the local URL defaults to
@@ -72,7 +72,7 @@ Terminal 2:  ./taskfile.sh web         # Next.js dev server
 Terminal 3:  ./taskfile.sh tunnel      # Cloudflare tunnel
 ```
 
-Share `https://japanese.charlytoc.dev` — that's it.
+Share `https://ven-ayuda.charlytoc.dev` — that's it.
 
 ## Multiple tunnels / machines
 

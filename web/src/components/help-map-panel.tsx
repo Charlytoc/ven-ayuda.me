@@ -2,7 +2,7 @@
 
 import dynamic from "next/dynamic";
 
-import type { HelpRequest } from "@/lib/types/help-request";
+import type { HelpRequest, LatLng } from "@/lib/types/help-request";
 
 const HelpMap = dynamic(
   () => import("@/components/help-map").then((mod) => mod.HelpMap),
@@ -25,17 +25,20 @@ const HelpMap = dynamic(
   },
 );
 
-type LatLng = { lat: number; lng: number };
-
 type HelpMapPanelProps = {
   requests: HelpRequest[];
-  draftLocation: LatLng | null;
-  onDraftLocationChange: (location: LatLng) => void;
+  height?: number | string;
+  interactive?: boolean;
+  draftLocation?: LatLng | null;
+  onDraftLocationChange?: (location: LatLng) => void;
 };
 
-export function HelpMapPanel(props: HelpMapPanelProps) {
+export function HelpMapPanel({
+  height = "100%",
+  ...props
+}: HelpMapPanelProps) {
   return (
-    <div style={{ height: "100%", width: "100%" }}>
+    <div style={{ height, width: "100%", borderRadius: 8, overflow: "hidden" }}>
       <HelpMap {...props} />
     </div>
   );

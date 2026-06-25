@@ -17,6 +17,7 @@ router = Router(tags=["Help requests"])
 def _to_response(help_request: HelpRequest) -> HelpRequestResponse:
     return HelpRequestResponse(
         id=help_request.id,
+        title=help_request.title,
         latitude=help_request.latitude,
         longitude=help_request.longitude,
         severity=help_request.severity,
@@ -49,6 +50,7 @@ def create_help_request(request: HttpRequest, payload: HelpRequestCreate):
 
     with transaction.atomic():
         help_request = HelpRequest.objects.create(
+            title=payload.title.strip(),
             latitude=payload.latitude,
             longitude=payload.longitude,
             severity=payload.severity,

@@ -6,6 +6,7 @@ from core.models import HelpRequest
 class HelpRequestModelTests(TestCase):
     def test_create_help_request(self):
         request = HelpRequest.objects.create(
+            title="Familia atrapada en edificio",
             latitude="10.480600",
             longitude="-66.903600",
             severity=HelpRequest.Severity.URGENT,
