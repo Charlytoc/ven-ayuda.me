@@ -2,6 +2,12 @@ export type HelpRequestSeverity = "critical" | "urgent" | "moderate" | "low";
 
 export type HelpRequestStatus = "open" | "in_progress" | "resolved";
 
+export type HelpRequestParticipant = {
+  rescuer_profile_id: number;
+  display_name: string;
+  joined_at: string;
+};
+
 export type HelpRequest = {
   id: string;
   title: string;
@@ -14,6 +20,10 @@ export type HelpRequest = {
   contact_email: string;
   status: HelpRequestStatus;
   attachment_ids: string[];
+  participants: HelpRequestParticipant[];
+  resolved_by_name: string | null;
+  resolved_at: string | null;
+  resolution_note: string;
   created: string;
   modified: string;
 };

@@ -16,8 +16,13 @@ import { IconExternalLink, IconMail, IconMapPin, IconPhone } from "@tabler/icons
 import dayjs from "dayjs";
 import "dayjs/locale/es";
 
+import {
+  HelpRequestStatusSection,
+  RescuerAlertActions,
+} from "@/components/rescuer-alert-actions";
 import { attachmentPublicUrl } from "@/lib/api/uploads";
 import { severityColor, severityLabel } from "@/lib/constants";
+import { statusColor, statusLabel } from "@/lib/help-request-status";
 import type { HelpRequest } from "@/lib/types/help-request";
 
 dayjs.locale("es");
@@ -28,9 +33,13 @@ export function directionsUrl(lat: number, lng: number): string {
 
 type HelpRequestDetailViewProps = {
   request: HelpRequest;
+  onRequestUpdated?: (request: HelpRequest) => void;
 };
 
-export function HelpRequestDetailView({ request }: HelpRequestDetailViewProps) {
+export function HelpRequestDetailView({
+  request,
+  onRequestUpdated,
+}: HelpRequestDetailViewProps) {
   const lat = Number(request.latitude);
   const lng = Number(request.longitude);
   const hasContact =
@@ -43,17 +52,31 @@ export function HelpRequestDetailView({ request }: HelpRequestDetailViewProps) {
           <Title order={2} style={{ flex: 1 }}>
             {request.title}
           </Title>
-          <Badge
-            variant="filled"
-            style={{ backgroundColor: severityColor(request.severity) }}
-          >
-            {severityLabel(request.severity)}
-          </Badge>
+          <Group gap="xs">
+            <Badge
+              variant="filled"
+              style={{ backgroundColor: statusColor(request.status) }}
+            >
+              {statusLabel(request.status)}
+            </Badge>
+            <Badge
+              variant="filled"
+              style={{ backgroundColor: severityColor(request.severity) }}
+            >
+              {severityLabel(request.severity)}
+            </Badge>
+          </Group>
         </Group>
         <Text size="sm" c="dimmed">
           Reportado {dayjs(request.created).format("D MMM YYYY, HH:mm")}
         </Text>
       </Stack>
+
+      <HelpRequestStatusSection request={request} />
+
+      {onRequestUpdated ? (
+        <RescuerAlertActions request={request} onUpdated={onRequestUpdated} />
+      ) : null}
 
       {request.description ? (
         <Paper withBorder radius="md" p="md">

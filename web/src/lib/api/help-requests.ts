@@ -1,15 +1,25 @@
 import { API_BASE_URL } from "@/lib/api-base";
+import { getRescuerToken } from "@/lib/rescuer-auth-storage";
 import type {
   ApiError,
   HelpRequest,
   HelpRequestCreate,
 } from "@/lib/types/help-request";
 
+function authHeaders(): HeadersInit {
+  const token = getRescuerToken();
+  if (!token) {
+    return {};
+  }
+  return { Authorization: `Bearer ${token}` };
+}
+
 async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> {
   const response = await fetch(`${API_BASE_URL}${path}`, {
     ...init,
     headers: {
       "Content-Type": "application/json",
+      ...authHeaders(),
       ...init?.headers,
     },
   });
@@ -54,4 +64,20 @@ export async function createHelpRequest(
 
 export async function getHelpRequest(id: string): Promise<HelpRequest> {
   return apiFetch<HelpRequest>(`/help-requests/${id}/`);
+}
+
+export async function joinHelpRequest(id: string): Promise<HelpRequest> {
+  return apiFetch<HelpRequest>(`/help-requests/${id}/join`, {
+    method: "POST",
+  });
+}
+
+export async function resolveHelpRequest(
+  id: string,
+  resolution_note = "",
+): Promise<HelpRequest> {
+  return apiFetch<HelpRequest>(`/help-requests/${id}/resolve`, {
+    method: "POST",
+    body: JSON.stringify({ resolution_note }),
+  });
 }

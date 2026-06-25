@@ -23,6 +23,7 @@ import {
 import { createHelpRequest } from "@/lib/api/help-requests";
 import { uploadImage } from "@/lib/api/uploads";
 import { SEVERITY_OPTIONS } from "@/lib/constants";
+import { roundGeoCoord } from "@/lib/geo";
 import { helpRequestPath } from "@/lib/help-request-path";
 import type { HelpRequestSeverity, LatLng } from "@/lib/types/help-request";
 
@@ -120,8 +121,8 @@ export function ReportHelpForm() {
 
       const created = await createHelpRequest({
         title: trimmedTitle,
-        latitude: draftLocation.lat,
-        longitude: draftLocation.lng,
+        latitude: roundGeoCoord(draftLocation.lat),
+        longitude: roundGeoCoord(draftLocation.lng),
         severity,
         description: description.trim(),
         contact_name: contactName.trim(),

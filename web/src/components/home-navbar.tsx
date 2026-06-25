@@ -12,6 +12,7 @@ import {
 } from "@mantine/core";
 import { IconArrowLeft } from "@tabler/icons-react";
 import { VenAyudaLogoIcon } from "@/components/ven-ayuda-logo-icon";
+import { RescuerNavLink } from "@/components/rescuer-nav-link";
 
 type HomeNavbarProps = {
   title?: string;
@@ -53,9 +54,12 @@ export function HomeNavbar({ title, showBack = false }: HomeNavbarProps) {
             </Group>
           </Group>
           {!showBack ? (
-            <Text size="sm" c="dimmed" visibleFrom="sm">
-              Coordinación de ayuda — Venezuela
-            </Text>
+            <Group gap="md" wrap="nowrap">
+              <RescuerNavLink />
+              <Text size="sm" c="dimmed" visibleFrom="sm">
+                Coordinación de ayuda — Venezuela
+              </Text>
+            </Group>
           ) : null}
         </Group>
       </Container>

@@ -1,5 +1,6 @@
 from django.contrib import admin
 
+from core.admin.rescue_participation import RescueParticipationInline
 from core.models import HelpRequest, HelpRequestAttachment
 
 
@@ -19,10 +20,12 @@ class HelpRequestAdmin(admin.ModelAdmin):
         "contact_phone",
         "latitude",
         "longitude",
+        "resolved_by",
+        "resolved_at",
         "created",
     )
     list_filter = ("severity", "status", "created")
     search_fields = ("title", "description", "contact_name", "contact_email", "contact_phone")
-    readonly_fields = ("id", "created", "modified")
-    inlines = (HelpRequestAttachmentInline,)
+    readonly_fields = ("id", "created", "modified", "resolved_at")
+    inlines = (HelpRequestAttachmentInline, RescueParticipationInline)
     ordering = ("-created",)

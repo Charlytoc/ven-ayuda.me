@@ -22,7 +22,7 @@ function help() {
   echo "$0 <task> <args>"
   echo ""
   echo "Development Tasks:"
-  echo "  setup-env         Copy .env if missing and uv sync Django .venv (IDE / lint)"
+  echo "  setup-env         Copy .env if missing, generate VAPID keys, uv sync Django .venv"
   echo "  setup-django      Initialize Django (migrate, create superuser)"
   echo "  start [--rebuild,-r]   Start backend (Docker: Django, Celery, Redis, Realtime, Nginx)"
   echo "  down              Stop development environment"
@@ -45,6 +45,52 @@ function help() {
 
 function test() {
   docker compose -f docker-compose.yml exec django python manage.py test "$@"
+}
+
+function _set_env_var() {
+  local env_file="$1"
+  local key="$2"
+  local value="$3"
+  if grep -q "^${key}=" "$env_file"; then
+    sed -i '' "s|^${key}=.*|${key}=${value}|" "$env_file"
+  else
+    echo "${key}=${value}" >> "$env_file"
+  fi
+}
+
+function ensure_vapid_keys() {
+  local root="$1"
+  local env_file="$root/.env"
+
+  local pub priv
+  pub=$(grep '^WEB_PUSH_VAPID_PUBLIC_KEY=' "$env_file" 2>/dev/null | cut -d= -f2- || true)
+  priv=$(grep '^WEB_PUSH_VAPID_PRIVATE_KEY=' "$env_file" 2>/dev/null | cut -d= -f2- || true)
+
+  if [ -n "$pub" ] && [ -n "$priv" ]; then
+    return
+  fi
+
+  echo "Generating Web Push VAPID keys..."
+  local keys
+  keys=$(cd "$root/django" && uv run python scripts/generate_vapid_keys.py)
+  pub=$(echo "$keys" | sed -n '1p')
+  priv=$(echo "$keys" | sed -n '2p')
+
+  if [ -z "$pub" ] || [ -z "$priv" ]; then
+    echo "Failed to generate VAPID keys" >&2
+    return 1
+  fi
+
+  _set_env_var "$env_file" "WEB_PUSH_VAPID_PUBLIC_KEY" "$pub"
+  _set_env_var "$env_file" "WEB_PUSH_VAPID_PRIVATE_KEY" "$priv"
+
+  local subject
+  subject=$(grep '^WEB_PUSH_VAPID_SUBJECT=' "$env_file" 2>/dev/null | cut -d= -f2- || true)
+  if [ -z "$subject" ]; then
+    _set_env_var "$env_file" "WEB_PUSH_VAPID_SUBJECT" "mailto:admin@ven-ayuda.me"
+  fi
+
+  echo "Generated WEB_PUSH_VAPID_PUBLIC_KEY and WEB_PUSH_VAPID_PRIVATE_KEY in .env"
 }
 
 function setup-env() {
@@ -77,6 +123,8 @@ function setup-env() {
   echo "Syncing Django project (creates/updates django/.venv for IDE lint and IntelliSense)..."
   (cd "$root/django" && uv sync)
   echo "Django venv ready at django/.venv — select that interpreter in your editor if needed."
+
+  ensure_vapid_keys "$root"
 }
 
 function setup-django() {

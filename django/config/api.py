@@ -2,7 +2,12 @@ from django.contrib.admin.views.decorators import staff_member_required
 from ninja import NinjaAPI
 from ninja.errors import HttpError
 from config import settings
-from core.routers import file_uploads_router, help_requests_router
+from core.routers import (
+    auth_router,
+    file_uploads_router,
+    help_requests_router,
+    rescuers_router,
+)
 from core.schemas.help_requests import ErrorResponseSchema
 
 docs_decorator = staff_member_required if not settings.DEBUG else None
@@ -22,6 +27,8 @@ def http_error(request, exc):
 
 api.add_router("/uploads/", file_uploads_router)
 api.add_router("/help-requests/", help_requests_router)
+api.add_router("/auth/", auth_router)
+api.add_router("/rescuer/", rescuers_router)
 
 
 @api.get("/health")

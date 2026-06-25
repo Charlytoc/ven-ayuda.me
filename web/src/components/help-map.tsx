@@ -1,9 +1,18 @@
 "use client";
 
 import { useEffect } from "react";
-import { CircleMarker, MapContainer, TileLayer, Tooltip, useMap, useMapEvents } from "react-leaflet";
+import {
+  Circle,
+  CircleMarker,
+  MapContainer,
+  TileLayer,
+  Tooltip,
+  useMap,
+  useMapEvents,
+} from "react-leaflet";
 
 import { DEFAULT_ZOOM, VENEZUELA_CENTER, severityColor } from "@/lib/constants";
+import { circleBounds } from "@/lib/geo";
 import type { HelpRequest, LatLng } from "@/lib/types/help-request";
 
 import "leaflet/dist/leaflet.css";
@@ -17,6 +26,8 @@ type HelpMapProps = {
   focusRequest?: HelpRequest | null;
   showMarkerTitles?: boolean;
   panToLocation?: LatLng | null;
+  /** When set with draftLocation, draws a geodesic circle and fits the map to it. */
+  actionRadiusKm?: number | null;
 };
 
 function PanToLocationController({ location }: { location: LatLng }) {
@@ -52,6 +63,29 @@ function DraftLocationController({ location }: { location: LatLng }) {
     const targetZoom = map.getZoom() < 12 ? 14 : map.getZoom();
     map.flyTo([location.lat, location.lng], targetZoom, { duration: 0.4 });
   }, [location.lat, location.lng, map]);
+
+  return null;
+}
+
+function ActionRadiusFitController({
+  location,
+  radiusKm,
+}: {
+  location: LatLng;
+  radiusKm: number;
+}) {
+  const map = useMap();
+
+  useEffect(() => {
+    if (radiusKm <= 0) {
+      return;
+    }
+
+    const bounds = circleBounds(location, radiusKm);
+    map.whenReady(() => {
+      map.fitBounds(bounds, { padding: [28, 28], maxZoom: 15, animate: true });
+    });
+  }, [location.lat, location.lng, radiusKm, map]);
 
   return null;
 }
@@ -94,7 +128,13 @@ export function HelpMap({
   focusRequest = null,
   showMarkerTitles = false,
   panToLocation = null,
+  actionRadiusKm = null,
 }: HelpMapProps) {
+  const showActionRadius =
+    draftLocation != null &&
+    actionRadiusKm != null &&
+    actionRadiusKm > 0;
+
   return (
     <MapContainer
       center={[VENEZUELA_CENTER.lat, VENEZUELA_CENTER.lng]}
@@ -113,7 +153,26 @@ export function HelpMap({
       ) : null}
       {interactive && draftLocation ? (
         <>
-          <DraftLocationController location={draftLocation} />
+          {showActionRadius ? (
+            <ActionRadiusFitController
+              location={draftLocation}
+              radiusKm={actionRadiusKm}
+            />
+          ) : (
+            <DraftLocationController location={draftLocation} />
+          )}
+          {showActionRadius ? (
+            <Circle
+              center={[draftLocation.lat, draftLocation.lng]}
+              radius={actionRadiusKm * 1000}
+              pathOptions={{
+                color: "#1864ab",
+                weight: 2,
+                fillColor: "#228be6",
+                fillOpacity: 0.2,
+              }}
+            />
+          ) : null}
           <CircleMarker
             center={[draftLocation.lat, draftLocation.lng]}
             radius={10}

@@ -36,6 +36,7 @@ type HelpMapPanelProps = {
   focusRequest?: HelpRequest | null;
   showMarkerTitles?: boolean;
   panToLocation?: LatLng | null;
+  actionRadiusKm?: number | null;
 };
 
 export function HelpMapPanel({

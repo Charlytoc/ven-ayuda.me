@@ -4,6 +4,7 @@ from django.db import models
 from model_utils.models import TimeStampedModel
 
 from core.models.file_upload import FileUpload
+from core.models.rescuer_profile import RescuerProfile
 from core.models.user import User
 
 
@@ -41,11 +42,26 @@ class HelpRequest(TimeStampedModel):
         blank=True,
         related_name="help_requests",
     )
+    participants = models.ManyToManyField(
+        RescuerProfile,
+        through="RescueParticipation",
+        related_name="help_requests_joined",
+        blank=True,
+    )
     status = models.CharField(
         max_length=20,
         choices=Status.choices,
         default=Status.OPEN,
     )
+    resolved_by = models.ForeignKey(
+        User,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="help_requests_resolved",
+    )
+    resolved_at = models.DateTimeField(null=True, blank=True)
+    resolution_note = models.TextField(blank=True)
 
     class Meta:
         ordering = ("-created",)

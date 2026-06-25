@@ -2,8 +2,14 @@ import type { HelpRequest, LatLng } from "@/lib/types/help-request";
 
 export const NEARBY_RADIUS_KM = 50;
 export const ALERTS_PAGE_SIZE = 8;
+export const GEO_COORD_DECIMAL_PLACES = 6;
 
 const EARTH_RADIUS_KM = 6371;
+
+export function roundGeoCoord(value: number): number {
+  const factor = 10 ** GEO_COORD_DECIMAL_PLACES;
+  return Math.round(value * factor) / factor;
+}
 
 export function haversineDistanceKm(
   from: LatLng,
@@ -61,6 +67,21 @@ export function formatDistanceKm(km: number): string {
     return `${Math.round(km * 1000)} m`;
   }
   return `${km.toFixed(1)} km`;
+}
+
+/** Axis-aligned bounds that contain a circle of radiusKm around center (for map fitBounds). */
+export function circleBounds(
+  center: LatLng,
+  radiusKm: number,
+): [[number, number], [number, number]] {
+  const radiusM = radiusKm * 1000;
+  const latRad = (center.lat * Math.PI) / 180;
+  const latOffset = radiusM / 111_320;
+  const lngOffset = radiusM / (111_320 * Math.cos(latRad));
+  return [
+    [center.lat - latOffset, center.lng - lngOffset],
+    [center.lat + latOffset, center.lng + lngOffset],
+  ];
 }
 
 export function sortRequestsByDistance(

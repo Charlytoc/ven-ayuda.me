@@ -76,7 +76,10 @@ export default function AlertaDetailPage() {
                 />
               </Box>
 
-              <HelpRequestDetailView request={request} />
+              <HelpRequestDetailView
+                request={request}
+                onRequestUpdated={setRequest}
+              />
             </Stack>
           ) : null}
         </Container>
