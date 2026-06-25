@@ -13,6 +13,7 @@ import {
 } from "@mantine/core";
 
 import { HelpMapPanel } from "@/components/help-map-panel";
+import { HelpRequestDetailModal } from "@/components/help-request-detail-modal";
 import { HomeNavbar } from "@/components/home-navbar";
 import { SeverityLegend } from "@/components/severity-legend";
 import { listHelpRequests } from "@/lib/api/help-requests";
@@ -22,6 +23,7 @@ export default function MapaPage() {
   const [requests, setRequests] = useState<HelpRequest[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
+  const [selectedRequest, setSelectedRequest] = useState<HelpRequest | null>(null);
 
   const refreshRequests = useCallback(async () => {
     setLoadError(null);
@@ -62,7 +64,7 @@ export default function MapaPage() {
                   ? "Cargando alertas…"
                   : requests.length === 0
                     ? "No hay alertas activas."
-                    : `${requests.length} alerta${requests.length === 1 ? "" : "s"} activa${requests.length === 1 ? "" : "s"}.`}
+                    : `${requests.length} alerta${requests.length === 1 ? "" : "s"} activa${requests.length === 1 ? "" : "s"}. Toca un punto para ver detalles.`}
               </Text>
             </Group>
             {loadError ? (
@@ -89,11 +91,21 @@ export default function MapaPage() {
                 border: "1px solid var(--mantine-color-dark-4)",
               }}
             >
-              <HelpMapPanel requests={requests} height="100%" />
+              <HelpMapPanel
+                requests={requests}
+                height="100%"
+                onRequestSelect={setSelectedRequest}
+              />
             </Box>
           )}
         </Box>
       </AppShell.Main>
+
+      <HelpRequestDetailModal
+        request={selectedRequest}
+        opened={selectedRequest !== null}
+        onClose={() => setSelectedRequest(null)}
+      />
     </AppShell>
   );
 }

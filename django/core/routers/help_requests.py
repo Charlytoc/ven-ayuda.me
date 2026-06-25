@@ -61,6 +61,9 @@ def create_help_request(request: HttpRequest, payload: HelpRequestCreate):
         )
         if attachments:
             help_request.attachments.set(attachments)
+            FileUpload.objects.filter(id__in=[a.id for a in attachments]).update(
+                expires_at=None
+            )
 
     help_request = HelpRequest.objects.prefetch_related("attachments").get(
         pk=help_request.pk

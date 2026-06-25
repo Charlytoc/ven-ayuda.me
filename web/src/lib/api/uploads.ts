@@ -13,6 +13,10 @@ const ALLOWED_IMAGE_TYPES = new Set([
   "image/gif",
 ]);
 
+export function attachmentPublicUrl(fileUploadId: string): string {
+  return `${API_BASE_URL}/uploads/public/${fileUploadId}/`;
+}
+
 function resolveUploadUrl(uploadUrl: string): string {
   const apiOrigin = new URL(API_BASE_URL).origin;
 

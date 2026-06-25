@@ -51,3 +51,7 @@ export async function createHelpRequest(
     body: JSON.stringify(payload),
   });
 }
+
+export async function getHelpRequest(id: string): Promise<HelpRequest> {
+  return apiFetch<HelpRequest>(`/help-requests/${id}/`);
+}

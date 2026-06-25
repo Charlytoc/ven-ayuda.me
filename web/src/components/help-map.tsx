@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect } from "react";
-import L from "leaflet";
 import { CircleMarker, MapContainer, TileLayer, useMap, useMapEvents } from "react-leaflet";
 
 import { DEFAULT_ZOOM, VENEZUELA_CENTER, severityColor } from "@/lib/constants";
@@ -14,7 +13,19 @@ type HelpMapProps = {
   interactive?: boolean;
   draftLocation?: LatLng | null;
   onDraftLocationChange?: (location: LatLng) => void;
+  onRequestSelect?: (request: HelpRequest) => void;
 };
+
+function DraftLocationController({ location }: { location: LatLng }) {
+  const map = useMap();
+
+  useEffect(() => {
+    const targetZoom = map.getZoom() < 12 ? 14 : map.getZoom();
+    map.flyTo([location.lat, location.lng], targetZoom, { duration: 0.4 });
+  }, [location.lat, location.lng, map]);
+
+  return null;
+}
 
 function MapClickHandler({
   onDraftLocationChange,
@@ -29,26 +40,6 @@ function MapClickHandler({
       });
     },
   });
-  return null;
-}
-
-function DraftPin({ location }: { location: LatLng }) {
-  const map = useMap();
-
-  useEffect(() => {
-    const icon = L.divIcon({
-      className: "",
-      html: `<div style="width:18px;height:18px;border-radius:50%;background:#228be6;border:3px solid white;box-shadow:0 1px 4px rgba(0,0,0,0.35);"></div>`,
-      iconSize: [18, 18],
-      iconAnchor: [9, 9],
-    });
-
-    const marker = L.marker([location.lat, location.lng], { icon }).addTo(map);
-    return () => {
-      marker.remove();
-    };
-  }, [location.lat, location.lng, map]);
-
   return null;
 }
 
@@ -70,6 +61,7 @@ export function HelpMap({
   interactive = false,
   draftLocation = null,
   onDraftLocationChange,
+  onRequestSelect,
 }: HelpMapProps) {
   return (
     <MapContainer
@@ -86,7 +78,21 @@ export function HelpMap({
       {interactive && onDraftLocationChange ? (
         <MapClickHandler onDraftLocationChange={onDraftLocationChange} />
       ) : null}
-      {interactive && draftLocation ? <DraftPin location={draftLocation} /> : null}
+      {interactive && draftLocation ? (
+        <>
+          <DraftLocationController location={draftLocation} />
+          <CircleMarker
+            center={[draftLocation.lat, draftLocation.lng]}
+            radius={10}
+            pathOptions={{
+              color: "#ffffff",
+              weight: 3,
+              fillColor: "#228be6",
+              fillOpacity: 1,
+            }}
+          />
+        </>
+      ) : null}
       {requests.map((request) => {
         const lat = Number(request.latitude);
         const lng = Number(request.longitude);
@@ -104,6 +110,15 @@ export function HelpMap({
               fillColor: severityColor(request.severity),
               fillOpacity: 0.92,
             }}
+            eventHandlers={
+              onRequestSelect
+                ? {
+                    click: () => {
+                      onRequestSelect(request);
+                    },
+                  }
+                : undefined
+            }
           />
         );
       })}

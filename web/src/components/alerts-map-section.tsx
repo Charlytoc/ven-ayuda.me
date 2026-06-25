@@ -11,9 +11,13 @@ import type { HelpRequest } from "@/lib/types/help-request";
 
 type AlertsMapSectionProps = {
   requests: HelpRequest[];
+  onRequestSelect?: (request: HelpRequest) => void;
 };
 
-export function AlertsMapSection({ requests }: AlertsMapSectionProps) {
+export function AlertsMapSection({
+  requests,
+  onRequestSelect,
+}: AlertsMapSectionProps) {
   return (
     <Paper withBorder radius="md" p="md">
       <Stack gap="md">
@@ -45,14 +49,19 @@ export function AlertsMapSection({ requests }: AlertsMapSectionProps) {
             border: "1px solid var(--mantine-color-dark-4)",
           }}
         >
-          <HelpMapPanel requests={requests} height={COMPACT_MAP_HEIGHT} />
+            <HelpMapPanel
+              requests={requests}
+              height={COMPACT_MAP_HEIGHT}
+              contained
+              onRequestSelect={onRequestSelect}
+            />
         </Box>
 
-        <Text size="xs" c="dimmed">
-          {requests.length === 0
-            ? "Aún no hay alertas registradas."
-            : `${requests.length} alerta${requests.length === 1 ? "" : "s"} activa${requests.length === 1 ? "" : "s"}.`}
-        </Text>
+          <Text size="xs" c="dimmed">
+            {requests.length === 0
+              ? "Aún no hay alertas registradas."
+              : `${requests.length} alerta${requests.length === 1 ? "" : "s"} activa${requests.length === 1 ? "" : "s"}. Toca un punto para ver detalles.`}
+          </Text>
       </Stack>
     </Paper>
   );

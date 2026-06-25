@@ -4,8 +4,6 @@ import { useEffect, useRef, useState } from "react";
 import {
   Box,
   Button,
-  FileButton,
-  Group,
   Modal,
   Select,
   Stack,
@@ -14,9 +12,13 @@ import {
   TextInput,
 } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
-import { IconMapPin, IconPhoto } from "@tabler/icons-react";
+import { IconMapPin } from "@tabler/icons-react";
 
 import { HelpMapPanel } from "@/components/help-map-panel";
+import {
+  PhotoAttachmentsField,
+  usePhotoAttachments,
+} from "@/components/photo-attachments-field";
 import { createHelpRequest } from "@/lib/api/help-requests";
 import { uploadImage } from "@/lib/api/uploads";
 import { SEVERITY_OPTIONS } from "@/lib/constants";
@@ -36,8 +38,11 @@ export function ReportHelpModal({
   const [title, setTitle] = useState("");
   const [severity, setSeverity] = useState<HelpRequestSeverity>("urgent");
   const [description, setDescription] = useState("");
+  const [contactName, setContactName] = useState("");
+  const [contactPhone, setContactPhone] = useState("");
+  const [contactEmail, setContactEmail] = useState("");
   const [draftLocation, setDraftLocation] = useState<LatLng | null>(null);
-  const [photos, setPhotos] = useState<File[]>([]);
+  const { photos, setPhotos, clearPhotos } = usePhotoAttachments();
   const [submitting, setSubmitting] = useState(false);
   const [locating, setLocating] = useState(false);
   const resetOnClose = useRef(false);
@@ -65,8 +70,11 @@ export function ReportHelpModal({
     setTitle("");
     setSeverity("urgent");
     setDescription("");
+    setContactName("");
+    setContactPhone("");
+    setContactEmail("");
     setDraftLocation(null);
-    setPhotos([]);
+    clearPhotos();
   }
 
   function handleClose() {
@@ -134,7 +142,7 @@ export function ReportHelpModal({
     try {
       const attachmentIds: string[] = [];
       for (const photo of photos) {
-        attachmentIds.push(await uploadImage(photo));
+        attachmentIds.push(await uploadImage(photo.file));
       }
 
       await createHelpRequest({
@@ -143,6 +151,9 @@ export function ReportHelpModal({
         longitude: draftLocation.lng,
         severity,
         description: description.trim(),
+        contact_name: contactName.trim(),
+        contact_phone: contactPhone.trim(),
+        contact_email: contactEmail.trim(),
         attachment_ids: attachmentIds,
       });
 
@@ -223,20 +234,25 @@ export function ReportHelpModal({
             Usar mi ubicación
           </Button>
           <Box
+            className="leaflet-contained"
             style={{
               height: 220,
+              position: "relative",
               borderRadius: 8,
               overflow: "hidden",
               border: "1px solid var(--mantine-color-dark-4)",
             }}
           >
-            <HelpMapPanel
-              requests={[]}
-              height={220}
-              interactive
-              draftLocation={draftLocation}
-              onDraftLocationChange={setDraftLocation}
-            />
+            {opened ? (
+              <HelpMapPanel
+                requests={[]}
+                height={220}
+                contained
+                interactive
+                draftLocation={draftLocation}
+                onDraftLocationChange={setDraftLocation}
+              />
+            ) : null}
           </Box>
         </Stack>
 
@@ -248,32 +264,24 @@ export function ReportHelpModal({
           onChange={(event) => setDescription(event.currentTarget.value)}
         />
 
-        <Stack gap="xs">
-          <Text size="sm" fw={500}>
-            Fotos (opcional)
-          </Text>
-          <FileButton
-            onChange={(files) => {
-              if (files) {
-                setPhotos((current) => [...current, ...files]);
-              }
-            }}
-            accept="image/jpeg,image/png,image/webp,image/gif"
-            multiple
-          >
-            {(props) => (
-              <Button {...props} variant="default" leftSection={<IconPhoto size={16} />}>
-                Adjuntar fotos
-              </Button>
-            )}
-          </FileButton>
-          {photos.length > 0 ? (
-            <Text size="sm" c="dimmed">
-              {photos.length}{" "}
-              {photos.length === 1 ? "foto seleccionada" : "fotos seleccionadas"}
-            </Text>
-          ) : null}
-        </Stack>
+        <TextInput
+          label="Tu nombre (opcional)"
+          value={contactName}
+          onChange={(event) => setContactName(event.currentTarget.value)}
+        />
+        <TextInput
+          label="Teléfono (opcional)"
+          value={contactPhone}
+          onChange={(event) => setContactPhone(event.currentTarget.value)}
+        />
+        <TextInput
+          label="Correo (opcional)"
+          type="email"
+          value={contactEmail}
+          onChange={(event) => setContactEmail(event.currentTarget.value)}
+        />
+
+        <PhotoAttachmentsField photos={photos} onChange={setPhotos} />
 
         <Button onClick={handleSubmit} loading={submitting} size="md" color="red">
           Enviar solicitud

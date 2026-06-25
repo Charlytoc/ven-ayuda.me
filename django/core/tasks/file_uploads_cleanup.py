@@ -11,8 +11,9 @@ from core.services.file_storage_service import file_storage_service
 def cleanup_expired_file_uploads() -> int:
     now = datetime.now(tz=timezone.utc)
     expired = FileUpload.objects.filter(
-        Q(expires_at__isnull=False) & Q(expires_at__lt=now)
-    )
+        Q(expires_at__isnull=False) & Q(expires_at__lt=now),
+        help_requests__isnull=True,
+    ).distinct()
     count = 0
     for file_upload in expired.iterator():
         try:

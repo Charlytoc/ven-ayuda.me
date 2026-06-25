@@ -29,16 +29,22 @@ type HelpMapPanelProps = {
   requests: HelpRequest[];
   height?: number | string;
   interactive?: boolean;
+  contained?: boolean;
   draftLocation?: LatLng | null;
   onDraftLocationChange?: (location: LatLng) => void;
+  onRequestSelect?: (request: HelpRequest) => void;
 };
 
 export function HelpMapPanel({
   height = "100%",
+  contained = false,
   ...props
 }: HelpMapPanelProps) {
   return (
-    <div style={{ height, width: "100%", borderRadius: 8, overflow: "hidden" }}>
+    <div
+      className={contained ? "leaflet-contained" : undefined}
+      style={{ height, width: "100%", borderRadius: 8, overflow: "hidden" }}
+    >
       <HelpMap {...props} />
     </div>
   );

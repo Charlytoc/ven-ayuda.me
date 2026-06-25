@@ -13,3 +13,26 @@ body {
 * {
   box-sizing: border-box;
 }
+
+/* Leaflet panes default to z-index 200–1000 and bleed over siblings (e.g. Mantine modals). */
+.leaflet-contained {
+  position: relative;
+  isolation: isolate;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.leaflet-contained .leaflet-container {
+  z-index: 0;
+}
+
+.leaflet-contained .leaflet-pane,
+.leaflet-contained .leaflet-top,
+.leaflet-contained .leaflet-bottom,
+.leaflet-contained .leaflet-control {
+  z-index: 1 !important;
+}
+
+.leaflet-contained .leaflet-control-zoom {
+  z-index: 2 !important;
+}

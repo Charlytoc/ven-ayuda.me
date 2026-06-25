@@ -1,7 +1,8 @@
 from django.core.cache import cache
 from django.core.exceptions import ValidationError
 from django.core.files.base import ContentFile
-from django.http import FileResponse, HttpRequest
+from django.http import FileResponse, HttpRequest, HttpResponseRedirect
+from django.conf import settings
 from ninja import Router
 
 from core.models.file_upload import FileUpload
@@ -124,3 +125,43 @@ def local_download(
         content_type=file_upload.content_type,
         filename=file_upload.original_filename,
     )
+
+
+@router.get(
+    "/public/{file_upload_id}/",
+    response={
+        404: ErrorResponseSchema,
+    },
+    auth=None,
+)
+def public_attachment(
+    request: HttpRequest,
+    file_upload_id: str,
+) -> FileResponse | HttpResponseRedirect | tuple[int, ErrorResponseSchema]:
+    try:
+        file_upload = FileUpload.objects.get(id=file_upload_id)
+    except (FileUpload.DoesNotExist, ValueError, ValidationError):
+        return 404, ErrorResponseSchema(error="File not found")
+
+    if not file_upload.help_requests.exists():
+        return 404, ErrorResponseSchema(error="File not found")
+
+    if file_upload.file:
+        return FileResponse(
+            file_upload.file.open("rb"),
+            content_type=file_upload.content_type,
+            filename=file_upload.original_filename,
+        )
+
+    if file_upload.bucket_key and settings.USE_S3:
+        url = file_storage_service._get_s3_client().generate_presigned_url(
+            "get_object",
+            Params={
+                "Bucket": settings.AWS_STORAGE_BUCKET_NAME,
+                "Key": file_upload.bucket_key,
+            },
+            ExpiresIn=3600,
+        )
+        return HttpResponseRedirect(url)
+
+    return 404, ErrorResponseSchema(error="File not found")

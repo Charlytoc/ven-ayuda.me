@@ -36,7 +36,10 @@ class HelpRequest(TimeStampedModel):
         related_name="help_requests",
     )
     attachments = models.ManyToManyField(
-        FileUpload, blank=True, related_name="help_requests"
+        FileUpload,
+        through="HelpRequestAttachment",
+        blank=True,
+        related_name="help_requests",
     )
     status = models.CharField(
         max_length=20,
