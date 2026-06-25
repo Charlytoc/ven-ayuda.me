@@ -34,11 +34,12 @@ async function authedFetch<T>(
     throw new Error(message);
   }
 
-  if (response.status === 204) {
+  const text = await response.text();
+  if (!text) {
     return undefined as T;
   }
 
-  return (await response.json()) as T;
+  return JSON.parse(text) as T;
 }
 
 export async function updateRescuerProfile(
