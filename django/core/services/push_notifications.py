@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 
 
 def _vapid_claims() -> dict:
-    subject = os.getenv("WEB_PUSH_VAPID_SUBJECT", "mailto:admin@ven-ayuda.me")
+    subject = os.getenv("WEB_PUSH_VAPID_SUBJECT", "mailto:admin@ven-emergencias.com")
     return {"sub": subject}
 
 

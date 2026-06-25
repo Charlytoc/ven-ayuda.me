@@ -7,12 +7,12 @@ import {
   AppShell,
   Container,
   Group,
-  Text,
   Title,
 } from "@mantine/core";
 import { IconArrowLeft } from "@tabler/icons-react";
-import { VenAyudaLogoIcon } from "@/components/ven-ayuda-logo-icon";
+import { VenEmergenciasLogoIcon } from "@/components/ven-emergencias-logo-icon";
 import { RescuerNavLink } from "@/components/rescuer-nav-link";
+import { APP_NAME } from "@/lib/constants";
 
 type HomeNavbarProps = {
   title?: string;
@@ -49,18 +49,11 @@ export function HomeNavbar({ title, showBack = false }: HomeNavbarProps) {
               style={{ textDecoration: "none", color: "inherit" }}
               wrap="nowrap"
             >
-              <VenAyudaLogoIcon size={24} />
-              <Title order={4}>{title ?? "ven-ayuda.me"}</Title>
+              <VenEmergenciasLogoIcon size={24} />
+              <Title order={4}>{title ?? APP_NAME}</Title>
             </Group>
           </Group>
-          {!showBack ? (
-            <Group gap="md" wrap="nowrap">
-              <RescuerNavLink />
-              <Text size="sm" c="dimmed" visibleFrom="sm">
-                Coordinación de ayuda — Venezuela
-              </Text>
-            </Group>
-          ) : null}
+          {!showBack ? <RescuerNavLink /> : null}
         </Group>
       </Container>
     </AppShell.Header>

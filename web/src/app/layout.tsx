@@ -6,12 +6,13 @@ import "@mantine/notifications/styles.css";
 import { ColorSchemeScript, MantineProvider, mantineHtmlProps } from "@mantine/core";
 import { Notifications } from "@mantine/notifications";
 import { QueryProviders } from "@/components/QueryProviders";
+import { APP_NAME } from "@/lib/constants";
 import { theme } from "@/lib/theme";
 import "./globals.css";
 
 export const metadata = {
-  title: "ven-ayuda.me",
-  description: "Mapa de solicitudes de ayuda en Venezuela.",
+  title: APP_NAME,
+  description: "Mapa de emergencias y coordinación de ayuda en Venezuela.",
 };
 
 export default function RootLayout({

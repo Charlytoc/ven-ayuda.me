@@ -12,7 +12,7 @@ from core.schemas.help_requests import ErrorResponseSchema
 
 docs_decorator = staff_member_required if not settings.DEBUG else None
 
-api = NinjaAPI(title="ven-ayuda.me", docs_decorator=docs_decorator)
+api = NinjaAPI(title="VenEmergencias", docs_decorator=docs_decorator)
 
 
 @api.exception_handler(HttpError)

@@ -1,5 +1,8 @@
 import type { HelpRequestSeverity } from "@/lib/types/help-request";
 
+export const APP_NAME = "VenEmergencias";
+export const APP_DOMAIN = "ven-emergencias.com";
+
 export const VENEZUELA_CENTER = { lat: 7.5, lng: -66.0 } as const;
 export const DEFAULT_ZOOM = 6;
 export const COMPACT_MAP_HEIGHT = 280;

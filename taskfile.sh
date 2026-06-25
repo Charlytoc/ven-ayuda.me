@@ -87,7 +87,7 @@ function ensure_vapid_keys() {
   local subject
   subject=$(grep '^WEB_PUSH_VAPID_SUBJECT=' "$env_file" 2>/dev/null | cut -d= -f2- || true)
   if [ -z "$subject" ]; then
-    _set_env_var "$env_file" "WEB_PUSH_VAPID_SUBJECT" "mailto:admin@ven-ayuda.me"
+    _set_env_var "$env_file" "WEB_PUSH_VAPID_SUBJECT" "mailto:admin@ven-emergencias.com"
   fi
 
   echo "Generated WEB_PUSH_VAPID_PUBLIC_KEY and WEB_PUSH_VAPID_PRIVATE_KEY in .env"

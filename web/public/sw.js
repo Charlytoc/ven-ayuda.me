@@ -1,5 +1,5 @@
 self.addEventListener("push", (event) => {
-  let data = { title: "ven-ayuda.me", body: "Nueva alerta cerca de ti", url: "/" };
+  let data = { title: "VenEmergencias", body: "Nueva alerta cerca de ti", url: "/" };
   try {
     if (event.data) {
       data = { ...data, ...event.data.json() };

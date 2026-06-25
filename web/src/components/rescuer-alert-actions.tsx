@@ -72,9 +72,19 @@ export function RescuerAlertActions({
   }
 
   async function handleResolve() {
+    const note = resolutionNote.trim();
+    if (!note) {
+      notifications.show({
+        color: "red",
+        title: "Nota requerida",
+        message: "Describe qué ocurrió antes de marcar la alerta como resuelta.",
+      });
+      return;
+    }
+
     setResolving(true);
     try {
-      const updated = await resolveHelpRequest(request.id, resolutionNote);
+      const updated = await resolveHelpRequest(request.id, note);
       onUpdated(updated);
       setShowResolveForm(false);
       notifications.show({
@@ -123,20 +133,30 @@ export function RescuerAlertActions({
         {showResolveForm ? (
           <Stack gap="sm">
             <Textarea
-              label="Nota (opcional)"
+              label="Nota"
+              description="Obligatoria: qué se hizo o qué se encontró al atender la emergencia."
               placeholder="Ej. personas evacuadas, heridos atendidos…"
               value={resolutionNote}
               onChange={(e) => setResolutionNote(e.currentTarget.value)}
               minRows={2}
+              required
             />
             <Group gap="sm">
-              <Button color="green" loading={resolving} onClick={handleResolve}>
+              <Button
+                color="green"
+                loading={resolving}
+                disabled={!resolutionNote.trim()}
+                onClick={handleResolve}
+              >
                 Confirmar resolución
               </Button>
               <Button
                 variant="subtle"
                 color="gray"
-                onClick={() => setShowResolveForm(false)}
+                onClick={() => {
+                  setShowResolveForm(false);
+                  setResolutionNote("");
+                }}
               >
                 Cancelar
               </Button>

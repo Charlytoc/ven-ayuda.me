@@ -1,5 +1,5 @@
-const TOKEN_KEY = "ven-ayuda.rescuer.token";
-const USER_KEY = "ven-ayuda.rescuer.user";
+const TOKEN_KEY = "ven-emergencias.rescuer.token";
+const USER_KEY = "ven-emergencias.rescuer.user";
 
 export type RescuerSessionUser = {
   id: number;

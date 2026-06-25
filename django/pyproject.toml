@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "ven-ayuda"
 version = "0.1.0"
-description = "ven-ayuda.me — emergency help requests API"
+description = "VenEmergencias — emergency help requests API"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [

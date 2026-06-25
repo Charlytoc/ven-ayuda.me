@@ -20,8 +20,8 @@ from core.models import (
     User,
 )
 
-admin.site.site_header = "ven-ayuda.me"
-admin.site.site_title = "ven-ayuda.me"
+admin.site.site_header = "VenEmergencias"
+admin.site.site_title = "VenEmergencias"
 admin.site.index_title = "Administration"
 
 admin.site.register(User, UserAdmin)

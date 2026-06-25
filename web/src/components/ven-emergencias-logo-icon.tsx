@@ -2,7 +2,7 @@
 
 import { useId } from "react";
 
-type VenAyudaLogoIconProps = {
+type VenEmergenciasLogoIconProps = {
   size?: number;
 };
 
@@ -10,8 +10,8 @@ const FLAG_YELLOW = "#FFCC00";
 const FLAG_BLUE = "#00247D";
 const FLAG_RED = "#CF142B";
 
-export function VenAyudaLogoIcon({ size = 24 }: VenAyudaLogoIconProps) {
-  const gradientId = `ven-ayuda-flag-${useId().replace(/:/g, "")}`;
+export function VenEmergenciasLogoIcon({ size = 24 }: VenEmergenciasLogoIconProps) {
+  const gradientId = `ven-emergencias-flag-${useId().replace(/:/g, "")}`;
 
   return (
     <svg
