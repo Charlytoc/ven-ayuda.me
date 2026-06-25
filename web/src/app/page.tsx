@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import Link from "next/link";
 import {
   AppShell,
   Button,
@@ -15,7 +16,6 @@ import { IconAlertTriangle } from "@tabler/icons-react";
 
 import { AlertsMapSection } from "@/components/alerts-map-section";
 import { HomeNavbar } from "@/components/home-navbar";
-import { ReportHelpModal } from "@/components/report-help-modal";
 import { useOpenHelpRequest } from "@/hooks/use-open-help-request";
 import { listHelpRequests } from "@/lib/api/help-requests";
 import type { HelpRequest } from "@/lib/types/help-request";
@@ -24,7 +24,6 @@ export default function HomePage() {
   const [requests, setRequests] = useState<HelpRequest[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
-  const [formOpen, setFormOpen] = useState(false);
   const openHelpRequest = useOpenHelpRequest();
 
   const refreshRequests = useCallback(async () => {
@@ -67,13 +66,15 @@ export default function HomePage() {
                 </Title>
                 <Text c="gray.2" size="md" maw={560}>
                   Si tienes una emergencia causada por el terremoto y aún no has
-                  recibido asistencia, pide ayuda ahora.
+                  recibido asistencia — para ti o para otra persona — pide ayuda
+                  ahora.
                 </Text>
                 <Button
+                  component={Link}
+                  href="/pedir-ayuda"
                   size="md"
                   color="red"
                   leftSection={<IconAlertTriangle size={18} />}
-                  onClick={() => setFormOpen(true)}
                 >
                   Pedir ayuda
                 </Button>
@@ -100,14 +101,6 @@ export default function HomePage() {
           </Stack>
         </Container>
       </AppShell.Main>
-
-      <ReportHelpModal
-        opened={formOpen}
-        onClose={() => setFormOpen(false)}
-        onSubmitted={() => {
-          void refreshRequests();
-        }}
-      />
     </AppShell>
   );
 }

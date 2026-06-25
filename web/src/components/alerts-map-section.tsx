@@ -1,12 +1,24 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Box, Button, Group, Paper, Stack, Text, Title } from "@mantine/core";
+import {
+  Box,
+  Button,
+  Group,
+  Paper,
+  Stack,
+  Text,
+  Title,
+} from "@mantine/core";
 import { IconArrowsMaximize } from "@tabler/icons-react";
 
+import { AlertsList } from "@/components/alerts-list";
+import { AlertsMapFilters } from "@/components/alerts-map-filters";
 import { HelpMapPanel } from "@/components/help-map-panel";
-import { SeverityLegend } from "@/components/severity-legend";
+import { useAlertFilters } from "@/hooks/use-alert-filters";
 import { COMPACT_MAP_HEIGHT } from "@/lib/constants";
+import { ALERTS_PAGE_SIZE } from "@/lib/geo";
 import type { HelpRequest } from "@/lib/types/help-request";
 
 type AlertsMapSectionProps = {
@@ -18,6 +30,13 @@ export function AlertsMapSection({
   requests,
   onRequestSelect,
 }: AlertsMapSectionProps) {
+  const [page, setPage] = useState(1);
+  const filters = useAlertFilters(requests);
+
+  useEffect(() => {
+    setPage(1);
+  }, [filters.selectedSeverities, filters.nearMeEnabled, requests.length]);
+
   return (
     <Paper withBorder radius="md" p="md">
       <Stack gap="md">
@@ -39,7 +58,16 @@ export function AlertsMapSection({
           </Button>
         </Group>
 
-        <SeverityLegend />
+        <AlertsMapFilters
+          selectedSeverities={filters.selectedSeverities}
+          onToggleSeverity={filters.toggleSeverity}
+          nearMeEnabled={filters.nearMeEnabled}
+          onNearMeChange={filters.setNearMe}
+          locating={filters.locating}
+          locationError={filters.locationError}
+          statusMessage={filters.statusMessage()}
+          nearMeDescription={`Filtra mapa y lista en un radio de 50 km (desactivado por defecto)`}
+        />
 
         <Box
           style={{
@@ -49,19 +77,24 @@ export function AlertsMapSection({
             border: "1px solid var(--mantine-color-dark-4)",
           }}
         >
-            <HelpMapPanel
-              requests={requests}
-              height={COMPACT_MAP_HEIGHT}
-              contained
-              onRequestSelect={onRequestSelect}
-            />
+          <HelpMapPanel
+            requests={filters.filteredRequests}
+            height={COMPACT_MAP_HEIGHT}
+            contained
+            showMarkerTitles
+            panToLocation={filters.nearMeEnabled ? filters.userLocation : null}
+            onRequestSelect={onRequestSelect}
+          />
         </Box>
 
-          <Text size="xs" c="dimmed">
-            {requests.length === 0
-              ? "Aún no hay alertas registradas."
-              : `${requests.length} alerta${requests.length === 1 ? "" : "s"} activa${requests.length === 1 ? "" : "s"}. Toca un punto para ver detalles.`}
-          </Text>
+        <AlertsList
+          requests={filters.listRequests}
+          page={page}
+          pageSize={ALERTS_PAGE_SIZE}
+          onPageChange={setPage}
+          userLocation={filters.userLocation}
+          showDistance={filters.nearMeEnabled}
+        />
       </Stack>
     </Paper>
   );

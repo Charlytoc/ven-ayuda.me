@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { CircleMarker, MapContainer, TileLayer, useMap, useMapEvents } from "react-leaflet";
+import { CircleMarker, MapContainer, TileLayer, Tooltip, useMap, useMapEvents } from "react-leaflet";
 
 import { DEFAULT_ZOOM, VENEZUELA_CENTER, severityColor } from "@/lib/constants";
 import type { HelpRequest, LatLng } from "@/lib/types/help-request";
@@ -15,7 +15,20 @@ type HelpMapProps = {
   onDraftLocationChange?: (location: LatLng) => void;
   onRequestSelect?: (request: HelpRequest) => void;
   focusRequest?: HelpRequest | null;
+  showMarkerTitles?: boolean;
+  panToLocation?: LatLng | null;
 };
+
+function PanToLocationController({ location }: { location: LatLng }) {
+  const map = useMap();
+
+  useEffect(() => {
+    const targetZoom = map.getZoom() < 11 ? 12 : map.getZoom();
+    map.flyTo([location.lat, location.lng], targetZoom, { duration: 0.4 });
+  }, [location.lat, location.lng, map]);
+
+  return null;
+}
 
 function FocusedRequestController({ request }: { request: HelpRequest }) {
   const map = useMap();
@@ -79,6 +92,8 @@ export function HelpMap({
   onDraftLocationChange,
   onRequestSelect,
   focusRequest = null,
+  showMarkerTitles = false,
+  panToLocation = null,
 }: HelpMapProps) {
   return (
     <MapContainer
@@ -138,9 +153,34 @@ export function HelpMap({
                   }
                 : undefined
             }
-          />
+          >
+            {showMarkerTitles ? (
+              <Tooltip direction="top" offset={[0, -8]} opacity={0.92}>
+                <span style={{ fontSize: 12, fontWeight: 500 }}>{request.title}</span>
+              </Tooltip>
+            ) : null}
+          </CircleMarker>
         );
       })}
+      {panToLocation ? (
+        <>
+          <PanToLocationController location={panToLocation} />
+          <CircleMarker
+            center={[panToLocation.lat, panToLocation.lng]}
+            radius={12}
+            pathOptions={{
+              color: "#ffffff",
+              weight: 4,
+              fillColor: "#1971c2",
+              fillOpacity: 1,
+            }}
+          >
+            <Tooltip direction="top" offset={[0, -12]} opacity={0.95}>
+              <span style={{ fontSize: 12, fontWeight: 600 }}>Tu ubicación</span>
+            </Tooltip>
+          </CircleMarker>
+        </>
+      ) : null}
     </MapContainer>
   );
 }

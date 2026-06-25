@@ -10,7 +10,8 @@ import {
   Text,
   Title,
 } from "@mantine/core";
-import { IconArrowLeft, IconHeartHandshake } from "@tabler/icons-react";
+import { IconArrowLeft } from "@tabler/icons-react";
+import { VenAyudaLogoIcon } from "@/components/ven-ayuda-logo-icon";
 
 type HomeNavbarProps = {
   title?: string;
@@ -47,7 +48,7 @@ export function HomeNavbar({ title, showBack = false }: HomeNavbarProps) {
               style={{ textDecoration: "none", color: "inherit" }}
               wrap="nowrap"
             >
-              <IconHeartHandshake size={24} color="var(--mantine-color-red-5)" />
+              <VenAyudaLogoIcon size={24} />
               <Title order={4}>{title ?? "ven-ayuda.me"}</Title>
             </Group>
           </Group>

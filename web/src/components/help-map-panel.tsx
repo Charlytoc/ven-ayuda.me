@@ -34,6 +34,8 @@ type HelpMapPanelProps = {
   onDraftLocationChange?: (location: LatLng) => void;
   onRequestSelect?: (request: HelpRequest) => void;
   focusRequest?: HelpRequest | null;
+  showMarkerTitles?: boolean;
+  panToLocation?: LatLng | null;
 };
 
 export function HelpMapPanel({
