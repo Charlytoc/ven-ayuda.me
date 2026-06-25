@@ -13,9 +13,9 @@ import {
 } from "@mantine/core";
 
 import { HelpMapPanel } from "@/components/help-map-panel";
-import { HelpRequestDetailModal } from "@/components/help-request-detail-modal";
 import { HomeNavbar } from "@/components/home-navbar";
 import { SeverityLegend } from "@/components/severity-legend";
+import { useOpenHelpRequest } from "@/hooks/use-open-help-request";
 import { listHelpRequests } from "@/lib/api/help-requests";
 import type { HelpRequest } from "@/lib/types/help-request";
 
@@ -23,7 +23,7 @@ export default function MapaPage() {
   const [requests, setRequests] = useState<HelpRequest[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
-  const [selectedRequest, setSelectedRequest] = useState<HelpRequest | null>(null);
+  const openHelpRequest = useOpenHelpRequest();
 
   const refreshRequests = useCallback(async () => {
     setLoadError(null);
@@ -94,18 +94,12 @@ export default function MapaPage() {
               <HelpMapPanel
                 requests={requests}
                 height="100%"
-                onRequestSelect={setSelectedRequest}
+                onRequestSelect={openHelpRequest}
               />
             </Box>
           )}
         </Box>
       </AppShell.Main>
-
-      <HelpRequestDetailModal
-        request={selectedRequest}
-        opened={selectedRequest !== null}
-        onClose={() => setSelectedRequest(null)}
-      />
     </AppShell>
   );
 }

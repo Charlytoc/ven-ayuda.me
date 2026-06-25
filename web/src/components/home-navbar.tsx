@@ -35,7 +35,7 @@ export function HomeNavbar({ title, showBack = false }: HomeNavbarProps) {
                 variant="subtle"
                 color="gray"
                 aria-label="Volver"
-                onClick={() => router.push("/")}
+                onClick={() => router.back()}
               >
                 <IconArrowLeft size={18} />
               </ActionIcon>

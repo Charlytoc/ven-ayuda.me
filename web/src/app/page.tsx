@@ -14,9 +14,9 @@ import {
 import { IconAlertTriangle } from "@tabler/icons-react";
 
 import { AlertsMapSection } from "@/components/alerts-map-section";
-import { HelpRequestDetailModal } from "@/components/help-request-detail-modal";
 import { HomeNavbar } from "@/components/home-navbar";
 import { ReportHelpModal } from "@/components/report-help-modal";
+import { useOpenHelpRequest } from "@/hooks/use-open-help-request";
 import { listHelpRequests } from "@/lib/api/help-requests";
 import type { HelpRequest } from "@/lib/types/help-request";
 
@@ -25,7 +25,7 @@ export default function HomePage() {
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [formOpen, setFormOpen] = useState(false);
-  const [selectedRequest, setSelectedRequest] = useState<HelpRequest | null>(null);
+  const openHelpRequest = useOpenHelpRequest();
 
   const refreshRequests = useCallback(async () => {
     setLoadError(null);
@@ -94,7 +94,7 @@ export default function HomePage() {
             ) : (
               <AlertsMapSection
                 requests={requests}
-                onRequestSelect={setSelectedRequest}
+                onRequestSelect={openHelpRequest}
               />
             )}
           </Stack>
@@ -107,12 +107,6 @@ export default function HomePage() {
         onSubmitted={() => {
           void refreshRequests();
         }}
-      />
-
-      <HelpRequestDetailModal
-        request={selectedRequest}
-        opened={selectedRequest !== null}
-        onClose={() => setSelectedRequest(null)}
       />
     </AppShell>
   );

@@ -14,7 +14,23 @@ type HelpMapProps = {
   draftLocation?: LatLng | null;
   onDraftLocationChange?: (location: LatLng) => void;
   onRequestSelect?: (request: HelpRequest) => void;
+  focusRequest?: HelpRequest | null;
 };
+
+function FocusedRequestController({ request }: { request: HelpRequest }) {
+  const map = useMap();
+  const lat = Number(request.latitude);
+  const lng = Number(request.longitude);
+
+  useEffect(() => {
+    if (Number.isNaN(lat) || Number.isNaN(lng)) {
+      return;
+    }
+    map.flyTo([lat, lng], 15, { duration: 0.5 });
+  }, [lat, lng, map, request.id]);
+
+  return null;
+}
 
 function DraftLocationController({ location }: { location: LatLng }) {
   const map = useMap();
@@ -62,6 +78,7 @@ export function HelpMap({
   draftLocation = null,
   onDraftLocationChange,
   onRequestSelect,
+  focusRequest = null,
 }: HelpMapProps) {
   return (
     <MapContainer
@@ -75,6 +92,7 @@ export function HelpMap({
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
       <MapInvalidator />
+      {focusRequest ? <FocusedRequestController request={focusRequest} /> : null}
       {interactive && onDraftLocationChange ? (
         <MapClickHandler onDraftLocationChange={onDraftLocationChange} />
       ) : null}
@@ -99,14 +117,15 @@ export function HelpMap({
         if (Number.isNaN(lat) || Number.isNaN(lng)) {
           return null;
         }
+        const isFocused = focusRequest?.id === request.id;
         return (
           <CircleMarker
             key={request.id}
             center={[lat, lng]}
-            radius={interactive ? 10 : 8}
+            radius={isFocused ? 14 : interactive ? 10 : 8}
             pathOptions={{
               color: "#ffffff",
-              weight: 2,
+              weight: isFocused ? 3 : 2,
               fillColor: severityColor(request.severity),
               fillOpacity: 0.92,
             }}
