@@ -42,9 +42,23 @@ _site_hostname = urlparse(SITE_URL).hostname
 _site_allowed = [_site_hostname] if _site_hostname else []
 ALLOWED_HOSTS = list(dict.fromkeys(_base_allowed_hosts + _extra_allowed_hosts + _site_allowed))
 
+FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:3000").rstrip("/")
+
+
+def _frontend_origins(url: str) -> list[str]:
+    origins = [url.rstrip("/")]
+    parsed = urlparse(url)
+    host = parsed.hostname
+    if host and not host.startswith("www."):
+        origins.append(f"{parsed.scheme}://www.{host}")
+    return list(dict.fromkeys(origins))
+
+
 _csrf_trusted = [SITE_URL] if SITE_URL.startswith("https://") else []
 _extra_csrf = [o.strip() for o in os.getenv("CSRF_TRUSTED_ORIGINS", "").split(",") if o.strip()]
-CSRF_TRUSTED_ORIGINS = list(dict.fromkeys(_csrf_trusted + _extra_csrf))
+CSRF_TRUSTED_ORIGINS = list(
+    dict.fromkeys(_csrf_trusted + _extra_csrf + _frontend_origins(FRONTEND_URL))
+)
 
 # Application definition
 
@@ -208,15 +222,18 @@ CACHES = {
     }
 }
 
+DATA_UPLOAD_MAX_MEMORY_SIZE = 25 * 1024 * 1024
+
 # CORS Configuration
 _web_port = os.environ.get("WEB_PORT", "3000")
-_django_port = os.environ.get("DJANGO_PORT", "8000")
 
 CORS_ALLOWED_ORIGINS = [
     f"http://localhost:{_web_port}",
     f"http://127.0.0.1:{_web_port}",
-    os.getenv("FRONTEND_URL", "http://localhost:3000").rstrip("/"),
+    *_frontend_origins(FRONTEND_URL),
 ]
+_extra_cors = [o.strip() for o in os.getenv("CORS_ALLOWED_ORIGINS", "").split(",") if o.strip()]
+CORS_ALLOWED_ORIGINS = list(dict.fromkeys(CORS_ALLOWED_ORIGINS + _extra_cors))
 
 # In DEBUG, allow any localhost / 127.0.0.1 port (Next.js, Docker mapped ports like 9002, etc.)
 if DEBUG:
@@ -238,10 +255,6 @@ CORS_ALLOW_HEADERS = [
     "x-csrftoken",
     "x-requested-with",
 ]
-
-DATA_UPLOAD_MAX_MEMORY_SIZE = 25 * 1024 * 1024
-
-FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:3000")
 
 WEB_PUSH_VAPID_PUBLIC_KEY = os.getenv("WEB_PUSH_VAPID_PUBLIC_KEY", "")
 WEB_PUSH_VAPID_PRIVATE_KEY = os.getenv("WEB_PUSH_VAPID_PRIVATE_KEY", "")

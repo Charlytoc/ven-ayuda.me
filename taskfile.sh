@@ -219,6 +219,14 @@ function tunnel() {
   source "$(dirname "$0")/.env" 2>/dev/null || true
   local tunnel_name="${1:-ven-emergencias}"
   local tunnel_url="${2:-http://localhost:${ENTRYPOINT_PORT:-9000}}"
+  local config_path="${HOME}/.cloudflared/ven-emergencias.yml"
+
+  if [[ "$tunnel_name" == "ven-emergencias" && -f "$config_path" ]]; then
+    echo "tunnel → ${config_path}"
+    cloudflared tunnel --config "$config_path" run
+    return
+  fi
+
   echo "tunnel → ${tunnel_name} @ ${tunnel_url}"
   cloudflared tunnel run --url "$tunnel_url" "$tunnel_name"
 }

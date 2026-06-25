@@ -1,0 +1,13 @@
+# Copy to ~/.cloudflared/ven-emergencias.yml and replace TUNNEL_ID.
+# Created by: cloudflared tunnel create ven-emergencias
+# Credentials file: ~/.cloudflared/TUNNEL_ID.json (written automatically on create)
+#
+# DNS (Cloudflare dashboard, ven-emergencias.com zone):
+#   CNAME  api  →  TUNNEL_ID.cfargotunnel.com  (Proxied)
+
+tunnel: ven-emergencias
+credentials-file: /Users/YOU/.cloudflared/TUNNEL_ID.json
+ingress:
+  - hostname: api.ven-emergencias.com
+    service: http://localhost:9023
+  - service: http_status:404
