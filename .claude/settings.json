@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(uv sync *)",
+      "Bash(uv run *)",
+      "Bash(npx tsc *)",
+      "Bash(npx eslint *)",
+      "Bash(python3 -c ' *)",
+      "Bash(POSTGRES_HOST=localhost uv run python manage.py test core --verbosity=2)",
+      "Bash(docker compose *)"
+    ]
+  }
+}
