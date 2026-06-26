@@ -21,14 +21,9 @@ export function RescuerNavLink() {
 
   if (!loggedIn || !getRescuerToken()) {
     return (
-      <Group gap="sm" wrap="nowrap">
-        <Anchor component={Link} href="/rescatista/entrar" size="sm">
-          Entrar
-        </Anchor>
-        <Button component={Link} href="/rescatista/registro" size="xs" variant="light">
-          Ser rescatista
-        </Button>
-      </Group>
+      <Button component={Link} href="/rescatista/registro" size="xs" variant="light">
+        Ser rescatista
+      </Button>
     );
   }
 

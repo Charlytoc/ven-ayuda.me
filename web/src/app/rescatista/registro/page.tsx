@@ -59,49 +59,61 @@ export default function RescatistaRegistroPage() {
       <HomeNavbar title="Registro rescatista" showBack />
       <AppShell.Main>
         <Container size="sm" py="xl">
-          <Paper withBorder radius="md" p="xl">
-            <Stack gap="md" component="form" onSubmit={handleSubmit}>
-              <Title order={2}>Únete como rescatista</Title>
-              <Text size="sm" c="dimmed">
-                Recibe alertas en tu zona, ve en camino a emergencias y marca
-                cuando ya fueron atendidas.
-              </Text>
-              <TextInput
-                label="Nombre"
-                required
-                value={firstName}
-                onChange={(e) => setFirstName(e.currentTarget.value)}
-              />
-              <TextInput
-                label="Correo"
-                type="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.currentTarget.value)}
-              />
-              <PasswordInput
-                label="Contraseña"
-                required
-                minLength={8}
-                value={password}
-                onChange={(e) => setPassword(e.currentTarget.value)}
-              />
-              <TextInput
-                label="Teléfono (opcional)"
-                value={phone}
-                onChange={(e) => setPhone(e.currentTarget.value)}
-              />
-              <Button type="submit" loading={submitting}>
-                Crear cuenta
-              </Button>
-              <Text size="sm" c="dimmed">
-                ¿Ya tienes cuenta?{" "}
-                <Text component={Link} href="/rescatista/entrar" span inherit c="blue">
-                  Entrar
+          <Stack gap="md">
+            <Paper withBorder radius="md" p="lg">
+              <Stack gap="sm">
+                <Text size="sm" c="dimmed">
+                  ¿Ya tienes cuenta?
                 </Text>
-              </Text>
-            </Stack>
-          </Paper>
+                <Button
+                  component={Link}
+                  href="/rescatista/entrar"
+                  variant="default"
+                  fullWidth
+                >
+                  Inicia sesión
+                </Button>
+              </Stack>
+            </Paper>
+
+            <Paper withBorder radius="md" p="xl">
+              <Stack gap="md" component="form" onSubmit={handleSubmit}>
+                <Title order={2}>Únete como rescatista</Title>
+                <Text size="sm" c="dimmed">
+                  Recibe alertas en tu zona, ve en camino a emergencias y marca
+                  cuando ya fueron atendidas.
+                </Text>
+                <TextInput
+                  label="Nombre"
+                  required
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.currentTarget.value)}
+                />
+                <TextInput
+                  label="Correo"
+                  type="email"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.currentTarget.value)}
+                />
+                <PasswordInput
+                  label="Contraseña"
+                  required
+                  minLength={8}
+                  value={password}
+                  onChange={(e) => setPassword(e.currentTarget.value)}
+                />
+                <TextInput
+                  label="Teléfono (opcional)"
+                  value={phone}
+                  onChange={(e) => setPhone(e.currentTarget.value)}
+                />
+                <Button type="submit" loading={submitting}>
+                  Crear cuenta
+                </Button>
+              </Stack>
+            </Paper>
+          </Stack>
         </Container>
       </AppShell.Main>
     </AppShell>
