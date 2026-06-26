@@ -13,16 +13,18 @@ import {
 
 import { AlertsMapFilters } from "@/components/alerts-map-filters";
 import { HelpMapPanel } from "@/components/help-map-panel";
+import { MapPlaceSearch } from "@/components/map-place-search";
 import { HomeNavbar } from "@/components/home-navbar";
 import { useAlertFilters } from "@/hooks/use-alert-filters";
 import { useOpenHelpRequest } from "@/hooks/use-open-help-request";
 import { listHelpRequests } from "@/lib/api/help-requests";
-import type { HelpRequest } from "@/lib/types/help-request";
+import type { HelpRequest, LatLng } from "@/lib/types/help-request";
 
 export default function MapaPage() {
   const [requests, setRequests] = useState<HelpRequest[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
+  const [flyToLocation, setFlyToLocation] = useState<LatLng | null>(null);
   const openHelpRequest = useOpenHelpRequest();
   const filters = useAlertFilters(requests);
 
@@ -68,15 +70,22 @@ export default function MapaPage() {
               </Text>
             </Paper>
           ) : (
-            <AlertsMapFilters
-              selectedSeverities={filters.selectedSeverities}
-              onToggleSeverity={filters.toggleSeverity}
-              nearMeEnabled={filters.nearMeEnabled}
-              onNearMeChange={filters.setNearMe}
-              locating={filters.locating}
-              locationError={filters.locationError}
-              statusMessage={filters.statusMessage()}
-            />
+            <Stack gap="sm">
+              <MapPlaceSearch
+                label="Ir a un lugar"
+                placeholder="Buscar ciudad o pegar coordenadas"
+                onLocationSelect={setFlyToLocation}
+              />
+              <AlertsMapFilters
+                selectedSeverities={filters.selectedSeverities}
+                onToggleSeverity={filters.toggleSeverity}
+                nearMeEnabled={filters.nearMeEnabled}
+                onNearMeChange={filters.setNearMe}
+                locating={filters.locating}
+                locationError={filters.locationError}
+                statusMessage={filters.statusMessage()}
+              />
+            </Stack>
           )}
         </Container>
 
@@ -98,6 +107,7 @@ export default function MapaPage() {
                 requests={filters.filteredRequests}
                 height="100%"
                 showMarkerTitles
+                flyToLocation={flyToLocation}
                 panToLocation={filters.nearMeEnabled ? filters.userLocation : null}
                 onRequestSelect={openHelpRequest}
               />

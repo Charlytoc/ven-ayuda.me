@@ -21,6 +21,7 @@ import { IconBell, IconMapPin } from "@tabler/icons-react";
 
 import { HelpMapPanel } from "@/components/help-map-panel";
 import { HomeNavbar } from "@/components/home-navbar";
+import { MapPlaceSearch } from "@/components/map-place-search";
 import { fetchAuthMe, refreshRescuerSession } from "@/lib/api/auth";
 import {
   fetchVapidPublicKey,
@@ -295,6 +296,14 @@ export default function RescatistaPerfilPage() {
                   El círculo azul muestra tu radio de acción. Ajusta el control
                   para ver hasta dónde recibirás alertas.
                 </Text>
+                <MapPlaceSearch
+                  onLocationSelect={(loc) =>
+                    setLocation({
+                      lat: roundGeoCoord(loc.lat),
+                      lng: roundGeoCoord(loc.lng),
+                    })
+                  }
+                />
                 <Box
                   style={{
                     height: MAP_HEIGHT,

@@ -16,6 +16,7 @@ import { notifications } from "@mantine/notifications";
 import { IconMapPin } from "@tabler/icons-react";
 
 import { HelpMapPanel } from "@/components/help-map-panel";
+import { MapPlaceSearch } from "@/components/map-place-search";
 import {
   PhotoAttachmentsField,
   usePhotoAttachments,
@@ -107,7 +108,8 @@ export function ReportHelpForm() {
       notifications.show({
         color: "red",
         title: "Ubicación requerida",
-        message: "Marca la ubicación en el mapa o usa el botón de geolocalización.",
+        message:
+          "Busca un lugar, pega coordenadas, marca el mapa o usa geolocalización.",
       });
       return;
     }
@@ -196,9 +198,10 @@ export function ReportHelpForm() {
           <Text size="sm" c="dimmed">
             {locating
               ? "Obteniendo tu ubicación…"
-              : "Toca el mapa para marcar dónde se necesita ayuda."}
+              : "Busca un lugar, pega coordenadas o toca el mapa."}
           </Text>
         )}
+        <MapPlaceSearch onLocationSelect={setDraftLocation} />
         <Button
           variant="light"
           leftSection={<IconMapPin size={16} />}

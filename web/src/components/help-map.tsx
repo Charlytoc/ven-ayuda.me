@@ -26,6 +26,7 @@ type HelpMapProps = {
   focusRequest?: HelpRequest | null;
   showMarkerTitles?: boolean;
   panToLocation?: LatLng | null;
+  flyToLocation?: LatLng | null;
   /** When set with draftLocation, draws a geodesic circle and fits the map to it. */
   actionRadiusKm?: number | null;
 };
@@ -128,6 +129,7 @@ export function HelpMap({
   focusRequest = null,
   showMarkerTitles = false,
   panToLocation = null,
+  flyToLocation = null,
   actionRadiusKm = null,
 }: HelpMapProps) {
   const showActionRadius =
@@ -240,6 +242,7 @@ export function HelpMap({
           </CircleMarker>
         </>
       ) : null}
+      {flyToLocation ? <PanToLocationController location={flyToLocation} /> : null}
     </MapContainer>
   );
 }
